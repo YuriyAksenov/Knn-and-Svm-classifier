@@ -22,7 +22,7 @@ class Metrics:
         return (true_positive, false_positive, true_negative, false_negative)
 
     @staticmethod
-    def f_score(test_data, predicted_data):
+    def f_score(test_data: list, predicted_data: list):
         metrics = Metrics.get_metrics(test_data, predicted_data)
 
         true_positive = metrics[0]
@@ -37,11 +37,11 @@ class Metrics:
         return (fscore)
 
     @staticmethod
-    def plot_confusion_matrix(test_data, predicted_data):
+    def plot_confusion_matrix(test_data:list, predicted_data: list):
         import numpy as np
         metrics = Metrics.get_metrics(test_data, predicted_data)
         aplot_confusion_matrix(cm=np.array([[metrics[0], metrics[1]],
-                                            [metrics[3], metrics[2]]]), normalize=True, target_names=["ham", "spam"], title="Confusion Matrix, Normalized")
+                                            [metrics[3], metrics[2]]]), normalize=True, target_names=["0", "1"], title="Confusion Matrix, Normalized")
 
 
 def aplot_confusion_matrix(cm, target_names, title='Confusion matrix', cmap=None, normalize=True):
