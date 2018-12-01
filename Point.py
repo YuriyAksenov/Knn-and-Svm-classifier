@@ -7,7 +7,7 @@ class Point:
     def __init__(self, x: float, y: float, label: int):
         self.x = float(x)
         self.y = float(y)
-        self.label = label
+        self.label = int(label)
 
     def __str__(self):
         return "{x:%f,y:%f,c:%s}" % (self.x, self.y, self.label)
