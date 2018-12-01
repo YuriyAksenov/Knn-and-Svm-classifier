@@ -49,35 +49,35 @@ class KnnClassifier:
         predictions = []
         for test_point in test_data:
             # Calculate all distances between test point and other points
-            neighbors = self.__find_closest(test_point)
+            neighbors: List[Tuple[Point, float]] = self.__find_closest(test_point)
 
             measured_labels: List[Tuple[str, float]] = list()
             if self.coordinate_system == CoordinateSystem.Polar:
                 for label in self.labels:
-                    weights = self.__get_measured_label_by_proximity(
-                        [neighbor for neighbor in neighbors if neighbor[1] == label], test_point)
+                    current_label = [neighbor for neighbor in neighbors if neighbor[0].label == label]
+                    weights = self.__get_measured_label_by_proximity(current_label, test_point)
                     measured_labels.append((label, weights))
             else:
                 for label in self.labels:
-                    weights = self.__get_measured_label_by_weights(
-                        [neighbor for neighbor in neighbors if neighbor[1] == label])
+                    current_label = [neighbor for neighbor in neighbors if neighbor[0].label == label]
+                    weights = self.__get_measured_label_by_weights(current_label)
                     measured_labels.append((label, weights))
 
             predicted_label = max(
-                measured_labels, key=lambda distance: measured_labels[1])[0]
+                measured_labels, key=lambda measured_label: measured_label[1])[0]
             predictions.append(predicted_label)
         return predictions
 
     def __get_measured_label_by_proximity(self, neighbors: List[Tuple[Point, float]], test_point: Point):
-        result = 0
+        result = 0.0
         for item in neighbors:
-            result += self.__calculate_proximity(item[1], test_point)
+            result += self.__calculate_proximity(item[0], test_point)
         return result
 
     def __get_measured_label_by_weights(self, neighbors: List[Tuple[Point, float]]):
-        result = 0
+        result = 0.0
         for item in neighbors:
-            result += self.__calculate_weight(item[1], self.kernel_type)
+            result += item[1] * self.__calculate_kernel(item[1], self.kernel_type)
         return result
 
     # Minkowski
@@ -87,7 +87,7 @@ class KnnClassifier:
         distances = sorted(
             distances, key=lambda distance: distance["distance"])
         result: List[Tuple[Point, float]] = list(
-            map(lambda distance: distance["point"], distances[:self.k_neighbors]))
+            map(lambda distance: (distance["point"], distance["distance"]), distances[:self.k_neighbors]))
         return result
 
     @staticmethod
@@ -104,7 +104,7 @@ class KnnClassifier:
         return dot_points(point1, point2) / sqrt(dot_points(point1, point1)) / sqrt(dot_points(point2, point2))
 
     @staticmethod
-    def __calculate_weight(distance: float, kernel_type: KernelType):
+    def __calculate_kernel(distance: float, kernel_type: KernelType):
         r = distance
         # оптимальное Епанчиклва
         if kernel_type == KernelType.E:
