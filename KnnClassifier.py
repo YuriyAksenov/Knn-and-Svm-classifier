@@ -1,34 +1,49 @@
 from enum import Enum
 from typing import List, Dict, Tuple
 from Point import Point
-from math import exp, pi
+from math import exp, pi, sqrt
 
 
 class KernelType(Enum):
-    # default
+    # default linear
     Def = 0
     # оптимальное Епанчиклва
-    E = 0
+    E = 1
     # квартическое
-    Q = 1
+    Q = 2
     # теругольное
-    T = 2
+    T = 3
     # гаусовское
-    G = 3
+    G = 4
     # прямоугольное rectangle
-    R = 4
+    R = 5
+
+    @staticmethod
+    def as_list():
+        return [KernelType.Def, KernelType.E, KernelType.Q,  KernelType.T, KernelType.G, KernelType.R]
+
+class CoordinateSystem(Enum):
+    # Дикартово пространства
+    Cartesian = 0
+    # прямоугольное rectangle
+    Polar = 1
+
+    @staticmethod
+    def as_list():
+        return [CoordinateSystem.Cartesian, CoordinateSystem.Polar]
 
 
 class KnnClassifier:
 
     train_data: List[Point]
 
-    def train(self, train_data: List[Point], labels, k_neighbors, power=2, kernel_type: KernelType = KernelType.Def):
+    def train(self, train_data: List[Point], labels, k_neighbors, power=2, kernel_type: KernelType = KernelType.Def, coordinate_system: CoordinateSystem = CoordinateSystem.Cartesian):
         self.train_data = train_data
         self.labels = labels
         self.k_neighbors = k_neighbors
         self.power = power
         self.kernel_type = kernel_type
+        self.coordinate_system = coordinate_system
 
     def predict(self, test_data: List[Point]):
         predictions = []
@@ -36,22 +51,33 @@ class KnnClassifier:
             # Calculate all distances between test point and other points
             neighbors = self.__find_closest(test_point)
 
-            labels_wights: List[Tuple[str, float]] = list()
-            for label in self.labels:
-                weights = self.__get_label_weights(
-                    [neighbor for neighbor in neighbors if neighbor[1] == label])
-                labels_wights.append((label, weights))
+            measured_labels: List[Tuple[str, float]] = list()
+            if self.coordinate_system == CoordinateSystem.Polar:
+                for label in self.labels:
+                    weights = self.__get_measured_label_by_proximity(
+                        [neighbor for neighbor in neighbors if neighbor[1] == label], test_point)
+                    measured_labels.append((label, weights))
+            else:
+                for label in self.labels:
+                    weights = self.__get_measured_label_by_weights(
+                        [neighbor for neighbor in neighbors if neighbor[1] == label])
+                    measured_labels.append((label, weights))
 
             predicted_label = max(
-                labels_wights, key=lambda distance: labels_wights[1])[0]
+                measured_labels, key=lambda distance: measured_labels[1])[0]
             predictions.append(predicted_label)
         return predictions
 
-
-    def __get_label_weights(self, neighbors: List[Tuple[Point, float]]):
+    def __get_measured_label_by_proximity(self, neighbors: List[Tuple[Point, float]], test_point: Point):
         result = 0
         for item in neighbors:
-            result += self.__calculate_kernel(item[1], self.kernel_type)
+            result += self.__calculate_proximity(item[1], test_point)
+        return result
+
+    def __get_measured_label_by_weights(self, neighbors: List[Tuple[Point, float]]):
+        result = 0
+        for item in neighbors:
+            result += self.__calculate_weight(item[1], self.kernel_type)
         return result
 
     # Minkowski
@@ -68,12 +94,17 @@ class KnnClassifier:
     def __calculate_distance(point1, point2, p=2):
         return pow(abs(point1.x-point2.x)**p + abs(point1.y-point2.y)**p, 1/p)
 
+    # косинусная мера calculate_cosine_score
     @staticmethod
-    def __calculate_distance(point1, point2, p=2):
-        return pow(abs(point1.x-point2.x)**p + abs(point1.y-point2.y)**p, 1/p)
+    def __calculate_proximity(point1: Point, point2: Point):
+        def dot_points(point1: Point, point2: Point):
+            d = 0.0
+            d += point1.x * point2.x + point1.y * point2.y
+            return d
+        return dot_points(point1, point2) / sqrt(dot_points(point1, point1)) / sqrt(dot_points(point2, point2))
 
     @staticmethod
-    def __calculate_kernel(distance: float, kernel_type: KernelType):
+    def __calculate_weight(distance: float, kernel_type: KernelType):
         r = distance
         # оптимальное Епанчиклва
         if kernel_type == KernelType.E:
