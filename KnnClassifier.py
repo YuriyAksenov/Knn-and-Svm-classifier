@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Dict, Tuple
 from Point import Point
-from math import exp, pi, sqrt
+from math import exp, pi, sqrt, log
 
 
 class KernelType(Enum):
@@ -52,19 +52,22 @@ class KnnClassifier:
             neighbors: List[Tuple[Point, float]] = self.__find_closest(test_point)
 
             measured_labels: List[Tuple[str, float]] = list()
+            predicted_label = 0.0
             if self.coordinate_system == CoordinateSystem.Polar:
                 for label in self.labels:
                     current_label = [neighbor for neighbor in neighbors if neighbor[0].label == label]
                     weights = self.__get_measured_label_by_proximity(current_label, test_point)
                     measured_labels.append((label, weights))
+                predicted_label = max(
+                measured_labels, key=lambda measured_label: measured_label[1])[0]
             else:
                 for label in self.labels:
                     current_label = [neighbor for neighbor in neighbors if neighbor[0].label == label]
                     weights = self.__get_measured_label_by_weights(current_label)
                     measured_labels.append((label, weights))
 
-            predicted_label = max(
-                measured_labels, key=lambda measured_label: measured_label[1])[0]
+                predicted_label = min(
+                    measured_labels, key=lambda measured_label: measured_label[1])[0]
             predictions.append(predicted_label)
         return predictions
 
@@ -77,7 +80,8 @@ class KnnClassifier:
     def __get_measured_label_by_weights(self, neighbors: List[Tuple[Point, float]]):
         result = 0.0
         for item in neighbors:
-            result += item[1] * self.__calculate_kernel(item[1], self.kernel_type)
+            #result += item[1] * self.__calculate_kernel(item[1], self.kernel_type)
+            result += log(self.__calculate_kernel(item[1], self.kernel_type))
         return result
 
     # Minkowski
