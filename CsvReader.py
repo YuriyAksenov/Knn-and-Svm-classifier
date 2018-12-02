@@ -10,7 +10,7 @@ class Csv:
             if(isHeader):
                 file.readline()
             for line in file:
-                line = line.replace("\n","")
+                line = line.rstrip()
                 data_item: Dict = dict()
                 splitted_line = [element.replace(
                     delimiter, ".") for element in line.split(separator)]
