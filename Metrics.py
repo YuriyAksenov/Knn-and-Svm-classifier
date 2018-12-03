@@ -3,7 +3,7 @@ from typing import List
 
 class Metrics:
     @staticmethod
-    def get_metrics(test_data: list, predicted_data: list):
+    def get_metrics(real_data: list, predicted_data: list):
         small_number = 0.000000000000000001
         true_positive = small_number
         false_positive = small_number
@@ -11,19 +11,19 @@ class Metrics:
         false_negative = small_number
 
         for i in range(len(predicted_data)):
-            if (test_data[i] == 0) and (predicted_data[i] == 0):
+            if (real_data[i] == 0) and (predicted_data[i] == 0):
                 true_negative += 1
-            if (test_data[i] == 0) and (predicted_data[i] == 1):
+            if (real_data[i] == 0) and (predicted_data[i] == 1):
                 false_positive += 1
-            if (test_data[i] == 1) and (predicted_data[i] == 1):
+            if (real_data[i] == 1) and (predicted_data[i] == 1):
                 true_positive += 1
-            if (test_data[i] == 1) and (predicted_data[i] == 0):
+            if (real_data[i] == 1) and (predicted_data[i] == 0):
                 false_negative += 1
         return (true_positive, false_positive, true_negative, false_negative)
 
     @staticmethod
-    def f_score(test_data: list, predicted_data: list):
-        metrics = Metrics.get_metrics(test_data, predicted_data)
+    def f_score(real_data: list, predicted_data: list):
+        metrics = Metrics.get_metrics(real_data, predicted_data)
 
         true_positive = metrics[0]
         false_positive = metrics[1]
@@ -37,9 +37,9 @@ class Metrics:
         return (fscore)
 
     @staticmethod
-    def plot_confusion_matrix(test_data:list, predicted_data: list):
+    def plot_confusion_matrix(real_data:list, predicted_data: list):
         import numpy as np
-        metrics = Metrics.get_metrics(test_data, predicted_data)
+        metrics = Metrics.get_metrics(real_data, predicted_data)
         aplot_confusion_matrix(cm=np.array([[metrics[0], metrics[1]],
                                             [metrics[3], metrics[2]]]), normalize=True, target_names=["0", "1"], title="Confusion Matrix, Normalized")
 
