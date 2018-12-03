@@ -66,7 +66,7 @@ class KnnClassifier:
                     weights = self.__get_measured_label_by_weights(current_label)
                     measured_labels.append((label, weights))
 
-                predicted_label = min(
+                predicted_label = max(
                     measured_labels, key=lambda measured_label: measured_label[1])[0]
             predictions.append(predicted_label)
         return predictions
@@ -80,8 +80,8 @@ class KnnClassifier:
     def __get_measured_label_by_weights(self, neighbors: List[Tuple[Point, float]]):
         result = 0.0
         for item in neighbors:
-            #result += item[1] * self.__calculate_kernel(item[1], self.kernel_type)
-            result += log(self.__calculate_kernel(item[1], self.kernel_type))
+            result += self.__calculate_kernel(item[1], self.kernel_type)
+            #result += log(self.__calculate_kernel(item[1], self.kernel_type))
         return result
 
     # Minkowski
@@ -90,8 +90,9 @@ class KnnClassifier:
             point, test_point, power)}, self.train_data)
         distances = sorted(
             distances, key=lambda distance: distance["distance"])
+        max_distance = distances[-1]["distance"]
         result: List[Tuple[Point, float]] = list(
-            map(lambda distance: (distance["point"], distance["distance"]), distances[:self.k_neighbors]))
+            map(lambda distance: (distance["point"], distance["distance"] / max_distance), distances[:self.k_neighbors]))
         return result
 
     @staticmethod
