@@ -113,10 +113,12 @@ class DataAnalyzer:
         print(np.array([str(i) for i in stats]).T)
 
         print("")
-        print("Max accuracy")
-        print(max(stats, key=lambda x: x.accuracy))
-        print("Max fscore")
+        print("Max f_score general")
         print(max(stats, key=lambda x: x.f_score))
+        print("Max f_score Cartesian")
+        print(max([stat for stat in stats if stat.coordinateSystem == CoordinateSystem.Cartesian], key=lambda x: x.f_score))
+        print("Max f_score Polar")
+        print(max([stat for stat in stats if stat.coordinateSystem == CoordinateSystem.Polar], key=lambda x: x.f_score))
 
     @staticmethod
     def calculateAverage(paramsArray):
