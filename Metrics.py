@@ -216,14 +216,14 @@ def aplot_confusion_matrix(cm, target_names, title='Confusion matrix', cmap=None
     plt.show()
 
 
-import numpy as np
+# import numpy as np
 
-r1 = np.zeros((1, 100), dtype=np.int32).ravel().tolist()
-r2 = np.ones((1, 50), dtype=np.int32).ravel().tolist()
-a = r1+r2
-p1 = np.zeros((1, 90), dtype=np.int32).ravel().tolist()
-p2 = np.ones((1, 60), dtype=np.int32).ravel().tolist()
-b = r1+r2 #p1+p2
+# r1 = np.zeros((1, 100), dtype=np.int32).ravel().tolist()
+# r2 = np.ones((1, 50), dtype=np.int32).ravel().tolist()
+# a = r1+r2
+# p1 = np.zeros((1, 90), dtype=np.int32).ravel().tolist()
+# p2 = np.ones((1, 60), dtype=np.int32).ravel().tolist()
+# b = r1+r2 #p1+p2
 
 # # x_square = Metrics.get_x_square_distribution(a, b, list([0, 1]))
 # # print(x_square)
