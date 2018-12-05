@@ -1,15 +1,29 @@
 
 from DataAnalyzer import DataAnalyzer
 from Data import Data
-from Svm import *
+from SvmClassifier import *
 import  numpy as np
 import random
 from Metrics import * 
 
+
+
+# можно увеличить простарнства в knn путем применения лангранжа. А потом при предикте брать те веса, которые посчитали для лангранжа, точку проецировать. И брать соседей
+
+
+
+
 fileName = 'Chips.txt'
 data = Data.read_points_from_file(fileName)
+random.shuffle(data)
+random.shuffle(data)
+random.shuffle(data)
+random.shuffle(data)
+random.shuffle(data)
+random.shuffle(data)
 # Data.show_data(data)
-DataAnalyzer.analyze_knn(data)
+#DataAnalyzer.analyze_knn(data)
+DataAnalyzer.analyze_svm(data)
 # random.shuffle(data)
 # random.shuffle(data)
 # random.shuffle(data)
