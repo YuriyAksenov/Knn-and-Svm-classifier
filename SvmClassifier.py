@@ -93,23 +93,3 @@ class SvmClassifier:
     def predict(self, X):
         # берем только знак от того, что получилось при предсказаниии +1 или -1
         return np.sign(self.project(X))
-
-    # @staticmethod
-    # def __calculate_kernel(distance: float, kernel_type: KernelType):
-    #     r = distance
-    #     # оптимальное Епанчиклва
-    #     if kernel_type == KernelType.E:
-    #         return 3/4*(1-r**2)
-    #     # квартическое
-    #     if kernel_type == KernelType.Q:
-    #         return 15/16*(1-r**2)**2
-    #     # теругольное
-    #     if kernel_type == KernelType.T:
-    #         return 1-abs(r)
-    #     # гуасовское
-    #     if kernel_type == KernelType.G:
-    #         return pow(2 * pi, (-0.5))*exp(-0.5*r**2)
-    #     # прямоугольное rectangle
-    #     if kernel_type == KernelType.R:
-    #         return 1/2
-    #     return 1
