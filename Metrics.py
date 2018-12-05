@@ -232,14 +232,14 @@ b = r1+r2 #p1+p2
 
 
 
-res = Metrics.p_value(a, b,  2)
-print(res)
-# res = Metrics.f_score(a, b)
+# res = Metrics.p_value(a, b,  2)
 # print(res)
-# res = Metrics.plot_confusion_matrix(a, b)
+# # res = Metrics.f_score(a, b)
+# # print(res)
+# # res = Metrics.plot_confusion_matrix(a, b)
+# # print(res)
+
+# res = Metrics.t_test(a,b)
 # print(res)
 
-res = Metrics.t_test(a,b)
-print(res)
-
-print(-1 - (-1))
+# print(-1 - (-1))
