@@ -4,9 +4,39 @@ from typing import List
 class Metrics:
 
     @staticmethod
-    def p_value(real_data: list, predicted_data: list, labels: list):
+    def t_test(real_data: list, predicted_data: list):
+        """Wilcoxon t-test for binary labels, so for diversity -1 0 1"""
+        participators_count, t_empirical = Metrics.__t_test_empirical(real_data, predicted_data)
+        table_row = Metrics.__t_value_table()[participators_count]
+        t_critical_005 = table_row[1]
+        t_critical_001 = table_row[2]
+        if(t_empirical < t_critical_005 or t_critical_001 < t_empirical ):
+            return "improved"
+        else:
+            return "not_improved"
+
+    @staticmethod
+    def __t_test_empirical(real_data: list, predicted_data: list):
+        """Wilcoxon t-test for binary labels, so for diversity -1 0 1"""
+        from collections import Counter
+
+        absolute_diversity = []
+
+        for i in range(len(real_data)):
+            div_abs = abs(predicted_data[i] - real_data[i])
+            if(div_abs != 0):
+                absolute_diversity.append(div_abs)
+        participators_count = len(absolute_diversity)
+        if(participators_count > 50):
+            print("Error there is no table more than 50 elements")
+            return 0.0;
+        t_empirical = sum(absolute_diversity)
+        return (participators_count, t_empirical)
+
+    @staticmethod
+    def p_value(real_data: list, predicted_data: list, labels_count: int):
         degrees_of_freedom, x_square = Metrics.__get_x_square_distribution(
-            real_data, predicted_data, labels)
+            real_data, predicted_data, labels_count)
         return Metrics.__p_value(degrees_of_freedom, x_square)
 
     @staticmethod
@@ -33,11 +63,11 @@ class Metrics:
                                             [metrics[3], metrics[2]]]), normalize=True, target_names=["0", "1"], title="Confusion Matrix, Normalized")
 
     @staticmethod
-    def __get_x_square_distribution(real_data: list, predicted_data: list, labels: list):
+    def __get_x_square_distribution(real_data: list, predicted_data: list, labels_count: int):
         """Get  x^2 = Σ((o-e)2/e)"""
-        degrees_of_freedom = len(labels) - 1
+        degrees_of_freedom = labels_count - 1
         result = 0.0
-        for label in labels:
+        for label in range(labels_count):
             # количество данных, принадлежащих данному классу реальных
             real_count = len([x for x in real_data if x == label])
             # количество данных, принадлежащих данному классу предсказанных
@@ -78,8 +108,69 @@ class Metrics:
 
     @staticmethod
     def __p_value_table():
+        """
+        При необходимости дополнить таблицу)
+        Таблица получения p value по хи квадрат. Первая строка  - заголовок, точнее p. 
+        Вторая и далее строки - степени свободы. Первая строк - первая степень. 
+        Значения в строке - это хи квадрат
+        """
         return [[0.99, 0.975, 0.95, 0.90, 0.10, 0.05, 0.025, 0.01],
-            [0.000, 0.001, 0.004, 0.016, 2.706, 3.841, 5.024, 6.635]]
+                [0.000, 0.001, 0.004, 0.016, 2.706, 3.841, 5.024, 6.635]]
+
+    @staticmethod
+    def __t_value_table():
+        """
+        Т-критерий Уилкоксона таблица
+        | число исследуемых n  | p = 0.05 | p = 0.1 |
+        """
+        return [
+            [5, 0, 0],
+            [6, 2, 0],
+            [7, 3, 0],
+            [8, 5, 1],
+            [9,  8,	3],
+            [10, 10, 5],
+            [11, 13, 7],
+            [12, 17, 9],
+            [13, 21, 12],
+            [14, 25, 15],
+            [15, 30, 19],
+            [16, 35, 23],
+            [17, 41, 27],
+            [18, 47, 32],
+            [19, 53, 37],
+            [20, 60, 43],
+            [21, 67, 49],
+            [22, 75, 55],
+            [23, 83, 62],
+            [24, 91, 69],
+            [25,100, 76],
+            [26,110, 84],
+            [27,119, 92],
+            [28,130, 101],
+            [29,140, 110],
+            [30,151, 120],
+            [31,163, 130],
+            [32,175, 140],
+            [33,187, 151],
+            [34,200, 162],
+            [35,213, 173],
+            [36,227, 185],
+            [37,241, 198],
+            [38,256, 211],
+            [39,271, 224],
+            [40,286, 238],
+            [41,302, 252],
+            [42,319, 266],
+            [43,336, 281],
+            [44,353, 296],
+            [45,371, 312],
+            [46,389, 328],
+            [47,407, 345],
+            [48,426, 362],
+            [49,446, 379],
+            [50,466, 397]
+        ]
 
 
 def aplot_confusion_matrix(cm, target_names, title='Confusion matrix', cmap=None, normalize=True):
@@ -125,22 +216,30 @@ def aplot_confusion_matrix(cm, target_names, title='Confusion matrix', cmap=None
     plt.show()
 
 
-# import numpy as np
+import numpy as np
 
-# r1 = np.zeros((1, 100), dtype=np.int32).ravel().tolist()
-# r2 = np.ones((1, 50), dtype=np.int32).ravel().tolist()
-# a = r1+r2
-# p1 = np.zeros((1, 90), dtype=np.int32).ravel().tolist()
-# p2 = np.ones((1, 60), dtype=np.int32).ravel().tolist()
-# b = p1+p2
+r1 = np.zeros((1, 100), dtype=np.int32).ravel().tolist()
+r2 = np.ones((1, 50), dtype=np.int32).ravel().tolist()
+a = r1+r2
+p1 = np.zeros((1, 90), dtype=np.int32).ravel().tolist()
+p2 = np.ones((1, 60), dtype=np.int32).ravel().tolist()
+b = r1+r2 #p1+p2
 
 # # x_square = Metrics.get_x_square_distribution(a, b, list([0, 1]))
 # # print(x_square)
 # # p = Metrics.p_value(x_square[0], x_square[1])
 # # print(p)
-# res = Metrics.p_value(a, b,  list([0, 1]))
-# print(res)
+
+
+
+res = Metrics.p_value(a, b,  2)
+print(res)
 # res = Metrics.f_score(a, b)
 # print(res)
 # res = Metrics.plot_confusion_matrix(a, b)
 # print(res)
+
+res = Metrics.t_test(a,b)
+print(res)
+
+print(-1 - (-1))
