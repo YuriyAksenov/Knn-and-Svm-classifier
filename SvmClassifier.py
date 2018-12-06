@@ -16,7 +16,7 @@ class SvmClassifier:
 
     def __init__(self, kernel=linear_kernel, C=None):
         self.kernel = kernel
-        self.C = C
+        self.C = 1
         if self.C is not None: self.C = float(self.C)
 
     def fit(self, X, y):

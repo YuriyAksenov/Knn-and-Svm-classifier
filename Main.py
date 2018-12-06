@@ -5,6 +5,8 @@ from SvmClassifier import *
 import  numpy as np
 import random
 from Metrics import * 
+from KnnClassifier import * 
+from SvmClassifier import * 
 
 
 
@@ -22,8 +24,27 @@ random.shuffle(data)
 random.shuffle(data)
 random.shuffle(data)
 # Data.show_data(data)
-#DataAnalyzer.analyze_knn(data)
-DataAnalyzer.analyze_svm(data)
+fknn, knnPredict = DataAnalyzer.analyze_knn_one(data, numFolds = 10)
+
+fsvm, svmPredict = DataAnalyzer.analyze_svm_one(data, numFolds =10)
+print("fscores ---------------   ")
+print(fknn)
+print(fsvm)
+
+test = Metrics.t_test_empirical(fknn, fsvm)
+print("TEST ---------------   ")
+print(test)
+
+print("p value ---------------   ")
+p = Metrics.p_value(knnPredict, svmPredict, 2)
+print(p)
+
+
+
+
+
+
+
 # random.shuffle(data)
 # random.shuffle(data)
 # random.shuffle(data)
@@ -51,3 +72,39 @@ DataAnalyzer.analyze_svm(data)
 
 # print('-------------------------------')
 # print(f)
+
+
+
+
+
+
+
+
+
+
+
+svm_print = """
+SVM ---------------------------------------------------------
+
+Max f_score general
+| numFold:4 | kernel:<function gaussian_kernel at 0x00000225CC41D400> | 0.6008 | 0.7325 | improved|
+Max p value general
+| numFold:4 | kernel:<function gaussian_kernel at 0x00000225CC41D400> | 0.6008 | 0.7325 | improved|
+Max t Wilcoxon general
+| numFold:4 | kernel:<function gaussian_kernel at 0x00000225CC41D400> | 0.6008 | 0.7325 | improved|
+
+SVM ---------------------------------------------------------
+"""
+
+knn_print = """
+KNN ---------------------------------------------------------
+
+Max f_score general
+| numFold:4 | numNeighbor:6 | power:2 | kernel:KernelType.E | CoordinateSystem.Cartesian | 0.6989 | 0.9000 | improved |
+Max p value general
+| numFold:4 | numNeighbor:6 | power:2 | kernel:KernelType.E | CoordinateSystem.Cartesian | 0.6989 | 0.9000 | improved |
+Max t Wilcoxon general
+| numFold:4 | numNeighbor:6 | power:2 | kernel:KernelType.E | CoordinateSystem.Cartesian | 0.6989 | 0.9000 | improved |
+
+KNN ---------------------------------------------------------
+"""

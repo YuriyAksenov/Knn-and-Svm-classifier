@@ -15,7 +15,7 @@ class Stat:
     #     return  main + params 
     def __str__(self):
         main = "| numFold:%d | numNeighbor:%d | power:%d | kernel:%s | %s " % (self.numFolds, self.numNeighbor, self.power, self.kernel, self.coordinateSystem)
-        params = "| %0.4f | %0.4f | %0.4f |" % (self.f_score, self.p_value, self.t_test)
+        params = "| %0.4f | %0.4f | %s |" % (self.f_score, self.p_value, self.t_test)
         return  main + params 
 
 class StatSvm:
@@ -32,5 +32,5 @@ class StatSvm:
     #     return  main + params 
     def __str__(self):
         main = "| numFold:%d | kernel:%s " % (self.numFolds, self.kernel)
-        params = "| %0.4f | %0.4f | %0.4f |" % (self.f_score, self.p_value, self.t_test)
+        params = "| %0.4f | %0.4f | %s|" % (self.f_score, self.p_value, self.t_test)
         return  main + params 

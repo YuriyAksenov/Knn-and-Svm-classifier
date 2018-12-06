@@ -16,6 +16,56 @@ class Metrics:
             return "not_improved"
 
     @staticmethod
+    def t_test_empirical(real_data: list, predicted_data: list):
+        """Wilcoxon t-test for binary labels, so for diversity -1 0 1"""
+        from collections import Counter
+
+        absolute_diversity = []
+
+        for i in range(len(real_data)):
+            div_abs = predicted_data[i] - real_data[i]
+            if(div_abs != 0):
+                absolute_diversity.append(div_abs)
+        absolute_diversity.sort(key = abs)
+        participators_count = len(absolute_diversity)
+        counters = Counter(absolute_diversity)
+        weighted_counters = []
+        weight = 0
+        for counter in counters:
+            weight += 1
+            weighted_counters.append((counter, weight))
+        
+        print(weighted_counters)
+        
+        weighted_diversity = []
+        for item in absolute_diversity:
+            counter = None
+            for wighted_counter in weighted_counters:
+                if(wighted_counter[0] == item):
+                    counter = wighted_counter
+                    break;
+            weighted_diversity.append(wighted_counter[1])
+        #print(weighted_diversity)
+        t_empirical = 0.0;
+        minus_count  = 0
+        for item in weighted_counters:
+            if(item[0]<0):
+                minus_count +=1
+        
+        plus_count = len(weighted_counters) - minus_count;
+        if(plus_count > minus_count):
+            for item in weighted_counters:
+                if(item[0]<0):
+                    t_empirical +=item[1]
+        else:
+            for item in weighted_counters:
+                if(item[0]>0):
+                    t_empirical +=item[1]
+
+
+        return (participators_count, t_empirical)
+
+    @staticmethod
     def __t_test_empirical(real_data: list, predicted_data: list):
         """Wilcoxon t-test for binary labels, so for diversity -1 0 1"""
         from collections import Counter
@@ -78,13 +128,15 @@ class Metrics:
     @staticmethod
     def __p_value(degrees_of_freedom: int, x_square_distribution: float):
         table = Metrics.__p_value_table()
+        #print("Distribution" + str(x_square_distribution))
         for index, x in enumerate(table[degrees_of_freedom]):
             if x_square_distribution > x:
                 continue
             if(index > 0):
-                return (table[0][index], table[0][index-1])
+                return (table[0][index], table[0][index])
             else:
                 return (table[0][index], table[0][index])
+        return (table[0][0], table[0][0]) 
 
     @staticmethod
     def __get_metrics(real_data: list, predicted_data: list):
